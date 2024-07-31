@@ -38,6 +38,18 @@ const openRoutes = [
     url: `${api}/user/auth/reset/password`,
     method: ['POST', 'OPTIONS'],
   },
+  {
+    url: `${api}/user/get-country`,
+    method: ['GET', 'OPTIONS'],
+  },
+  {
+    url: `${api}/user/update-countries`,
+    method: ['GET', 'OPTIONS'],
+  },
+  {
+    url: `${api}/user/add-blocked-country`,
+    method: ['POST', 'OPTIONS'],
+  },
 
   // For Admin
   {

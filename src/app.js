@@ -8,6 +8,9 @@ const errorHandler = require('./middlewares/errorHandler');
 // Server
 const app = express();
 
+// Trust proxy for IPv4
+app.set('trust proxy', true);
+
 // Middleware
 appMiddleware(app);
 app.options('*', cors());
