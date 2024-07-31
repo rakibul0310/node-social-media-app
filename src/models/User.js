@@ -2,34 +2,23 @@ const mongoose = require('mongoose');
 
 const userSchema = mongoose.Schema(
   {
-    name: {
+    countryCode: {
       type: String,
-      required: false,
+      required: true,
       trim: true,
-      default: '',
     },
-    email: {
+    localNumber: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    phoneNumber: {
       type: String,
       required: true,
       trim: true,
       unique: true,
     },
-    phone: {
-      type: String,
-      required: false,
-      trim: true,
-      unique: true,
-    },
-    password: {
-      type: String,
-      trim: true,
-      select: false,
-    },
     isVerified: {
-      type: Boolean,
-      default: false,
-    },
-    isAdmin: {
       type: Boolean,
       default: false,
     },

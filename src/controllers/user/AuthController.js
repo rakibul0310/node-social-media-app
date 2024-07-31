@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const transporter = require('../../helpers/nodemailer');
 const crypter = require('../../helpers/crypter');
+const sendSms = require('../../helpers/sendSms');
 const { User } = require('../../models/User');
 const { Otp } = require('../../models/Otp');
 const response = require('../../helpers/response');
@@ -12,24 +13,19 @@ const api = config.get('API_URL');
 
 exports.register = async (req, res) => {
   try {
-    const {
-      name,
-      email,
-      // mobile,
-      password,
-    } = req.body;
+    const { countryCode, localNumber } = req.body;
 
+    const phoneNumber = countryCode + localNumber;
     const user = new User({
-      name,
-      email,
-      // mobile,
-      password: bcrypt.hashSync(password, 10),
+      countryCode,
+      localNumber,
+      phoneNumber,
     });
     // create user
     await user.save();
 
     // create otp
-    const otpNumber = Math.floor(Math.random() * 99999);
+    const otpNumber = Math.floor(Math.random() * 999999);
     const otp = new Otp({
       user_id: user.id,
       otp: otpNumber,
@@ -38,36 +34,22 @@ exports.register = async (req, res) => {
     // save otp to db
     await otp.save();
 
-    // create email
-    const mailOptions = {
-      from: 'noreplay@galileobox.com',
-      to: `${user.email}`,
-      subject: 'OTP from GalileoBox',
-      text: `Your OTP is: ${otpNumber} This OTP is valid for 5 minutes.
-            Or go to this link to verify your account: 
-            ${url + api}/user/auth/verify?u=${crypter.encrypt(
-        user.email,
-      )}&otp=${crypter.encrypt(otpNumber)}`,
-    };
-
-    // send email
-    transporter.sendMail(mailOptions, error => {
-      if (error) {
-        return res.status(500).json({ error });
-      }
-    });
+    // send otp sms
+    sendSms(
+      phoneNumber,
+      `Your OTP is: ${otpNumber}. This OTP is valid for 5 minutes`,
+    );
 
     return response.success(
       res,
       {
-        name: user.name,
-        email: user.email,
-        // mobile: user.mobile,
+        userId: user.id,
+        phoneNumber: user.phoneNumber,
         isVerified: user.isVerified,
         created_at: user.created_at,
         updated_at: user.created_at,
       },
-      'User successfully registered. Verify your email to activate your account.',
+      'OTP has been sent to your phone.',
       201,
     );
   } catch (err) {
@@ -176,10 +158,10 @@ exports.verifyByLink = async (req, res) => {
 
 exports.verifyByOtp = async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    const { userId, otp } = req.body;
 
     // Validating User
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ _id: userId });
     if (!user) {
       return response.error(res, {}, 'Invalid User', 400);
     }
@@ -197,14 +179,33 @@ exports.verifyByOtp = async (req, res) => {
     }
 
     // Update User
-    await User.findOneAndUpdate({ email }, { isVerified: true }, { new: true });
+    await User.findOneAndUpdate(
+      { _id: userId },
+      { isVerified: true },
+      { new: true },
+    );
 
     // Delete OTP
     await Otp.findOneAndDelete({ otp, user_id: user.id });
 
+    // generate a token
+    const token = jwt.sign(
+      {
+        user_id: user.id,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '99y' },
+    );
+
     return response.success(
       res,
-      {},
+      {
+        user: {
+          userId: user.id,
+          phoneNumber: user.phoneNumber,
+        },
+        token,
+      },
       'Your account is verified successfully.',
       200,
     );
