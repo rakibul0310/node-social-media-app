@@ -6,21 +6,33 @@ const userSchema = mongoose.Schema(
       type: String,
       trim: true,
     },
-    countryCode: {
+    iso: {
       type: String,
       required: true,
       trim: true,
     },
-    localNumber: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    phoneNumber: {
+    number: {
       type: String,
       required: true,
       trim: true,
       unique: true,
+    },
+    type: {
+      type: String,
+      enum: ['private', 'public'],
+      default: 'private',
+    },
+    status: {
+      type: Boolean,
+      default: true,
+    },
+    valid: {
+      type: Boolean,
+      default: true,
+    },
+    suspended: {
+      type: Boolean,
+      default: false,
     },
   },
   {

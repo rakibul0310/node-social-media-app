@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const {
-  register,
   login,
   verifyByLink,
   verifyByOtp,
@@ -15,8 +14,6 @@ const {
 router.get(`/get-country`, userCountry);
 
 router.post(`/send-otp`, sendOtp);
-
-router.post(`/register`, register);
 
 router.post(`/login`, login);
 

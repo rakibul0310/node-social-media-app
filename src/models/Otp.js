@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const otpSchema = mongoose.Schema(
   {
-    phoneNumber: {
+    number: {
       type: String,
       required: true,
       trim: true,
@@ -10,6 +10,7 @@ const otpSchema = mongoose.Schema(
     otp: {
       type: Number,
       required: true,
+      unique: true,
       trim: true,
     },
     expire_at: {

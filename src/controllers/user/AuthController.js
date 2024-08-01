@@ -33,9 +33,6 @@ exports.userCountry = async (req, res) => {
     const getIp = await axios.get(`https://ipapi.co/${clientIp}/json/`);
     let countryCode = getIp.data?.country_code || 'US';
 
-    console.log(clientIp);
-    console.log(getIp.data);
-
     // Check if country is blocked or not
     const countryCheck = await Country.findOne({
       code: countryCode,
@@ -60,8 +57,8 @@ exports.userCountry = async (req, res) => {
 
 // send otp
 exports.sendOtp = async (req, res) => {
-  const { countryCode, localNumber } = req.body;
-  const phoneNumber = countryCode + localNumber;
+  const { countryCode, number } = req.body;
+  const phoneNumber = countryCode + number;
 
   // find existing otp and delete
   await Otp.findOneAndDelete({ phoneNumber });
@@ -69,8 +66,8 @@ exports.sendOtp = async (req, res) => {
   // create otp
   const otpNumber = Math.floor(Math.random() * 999999);
   const otp = new Otp({
-    phoneNumber,
-    otp: 1111 || otpNumber,
+    number: phoneNumber,
+    otp: otpNumber,
     expire_at: new Date(new Date().getTime() + 60 * 5000),
   });
   // save otp to db
@@ -92,58 +89,28 @@ exports.sendOtp = async (req, res) => {
   );
 };
 
-exports.register = async (req, res) => {
-  try {
-    const { countryCode, localNumber, otp } = req.body;
-
-    const phoneNumber = countryCode + localNumber;
-
-    // Validating OTP
-    const otpData = await Otp.findOne({ otp, phoneNumber });
-
-    if (!otpData?._id || otpData.phoneNumber !== phoneNumber) {
-      return response.error(res, {}, 'Invalid OTP.', 400);
-    }
-
-    const user = new User({
-      countryCode,
-      localNumber,
-      phoneNumber,
-    });
-    // create user
-    await user.save();
-
-    return response.success(
-      res,
-      {
-        userId: user.id,
-        phoneNumber: user.phoneNumber,
-        created_at: user.created_at,
-        updated_at: user.created_at,
-      },
-      'Registered successfully.',
-      201,
-    );
-  } catch (err) {
-    return response.error(res, err, 'Error Occurred.', err.status || 500);
-  }
-};
-
 exports.login = async (req, res) => {
   try {
-    const { countryCode, localNumber, otp } = req.body;
+    const { iso, countryCode, number, otp } = req.body;
 
-    const phoneNumber = countryCode + localNumber;
+    const phoneNumber = countryCode + number;
 
     // Validating OTP
-    const otpData = await Otp.findOne({ otp, phoneNumber });
+    const otpData = await Otp.findOne({ otp, number: phoneNumber });
 
-    if (!otpData?._id || otpData.phoneNumber !== phoneNumber) {
+    if (!otpData?._id || otpData.number !== phoneNumber) {
       return response.error(res, {}, 'Invalid OTP.', 400);
     }
 
     // check user
-    const user = await User.findOne({ phoneNumber: phoneNumber });
+    const user = await User.findOneAndUpdate(
+      { number: phoneNumber },
+      {
+        iso,
+        number: phoneNumber,
+      },
+      { new: true, upsert: true, setDefaultsOnInsert: true },
+    );
     if (!user?._id) {
       return response.error(res, {}, 'Authentication Field!', 401);
     }
@@ -151,7 +118,8 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       {
         user_id: user.id,
-        phoneNumber: user.phoneNumber,
+        number: user.number,
+        iso: user.iso,
       },
       process.env.JWT_SECRET,
       { expiresIn: '99y' },
@@ -160,10 +128,7 @@ exports.login = async (req, res) => {
     return response.success(
       res,
       {
-        user: {
-          user_id: user.id,
-          phoneNumber: user.phoneNumber,
-        },
+        user,
         token,
       },
       'Login Successfully!',
