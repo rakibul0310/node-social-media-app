@@ -7,6 +7,14 @@ const openRoutes = [
 
   // For User
   {
+    url: `${api}/user/auth/get-country`,
+    method: ['GET', 'POST', 'OPTIONS'],
+  },
+  {
+    url: `${api}/user/auth/send-otp`,
+    method: ['GET', 'POST', 'OPTIONS'],
+  },
+  {
     url: `${api}/user/auth/register`,
     method: ['POST', 'OPTIONS'],
   },
@@ -37,10 +45,6 @@ const openRoutes = [
   {
     url: `${api}/user/auth/reset/password`,
     method: ['POST', 'OPTIONS'],
-  },
-  {
-    url: `${api}/user/get-country`,
-    method: ['GET', 'OPTIONS'],
   },
   {
     url: `${api}/user/update-countries`,

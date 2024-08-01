@@ -5,9 +5,8 @@ const {
   profileUpdate,
   emailUpdate,
   changePassword,
-  userCountry,
   updateCountries,
-  addBlockedCountry,
+  blockCountry,
 } = require('../../controllers/user/UserController');
 
 // Verify OTP
@@ -25,13 +24,10 @@ router.patch(`/email/update`, emailUpdate);
 // User Change Password
 router.patch(`/change-password/`, changePassword);
 
-// User Country (Based on REQUEST)
-router.get(`/get-country`, userCountry);
-
 // Update Countries data to database
 router.get(`/update-countries`, updateCountries);
 
 // Add Blocked Country
-router.post(`/add-blocked-country`, addBlockedCountry);
+router.post(`/add-blocked-country`, blockCountry);
 
 module.exports = router;

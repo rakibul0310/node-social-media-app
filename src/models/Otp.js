@@ -2,17 +2,15 @@ const mongoose = require('mongoose');
 
 const otpSchema = mongoose.Schema(
   {
-    user_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      unique: true,
+    phoneNumber: {
+      type: String,
       required: true,
+      trim: true,
     },
     otp: {
       type: Number,
       required: true,
       trim: true,
-      unique: true,
     },
     expire_at: {
       type: String,

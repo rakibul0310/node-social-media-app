@@ -193,44 +193,6 @@ exports.changePassword = async (req, res) => {
 };
 
 // User Country (Based on REQUEST)
-exports.userCountry = async (req, res) => {
-  try {
-    // Get User IP from Request Body
-    let clientIp = '';
-    if (req.headers['x-forwarded-for']) {
-      clientIp = req.headers['x-forwarded-for'].split(',').shift().trim();
-    } else if (
-      req.socket &&
-      req.socket.remoteAddress &&
-      req.socket.remoteAddress !== '::1'
-    ) {
-      clientIp = req.socket.remoteAddress;
-    } else {
-      clientIp = req.ip; // IP from ExpressJS using `app.set("trust proxy", true);`
-    }
-
-    // Get Country from IP
-    const response = await axios.get(`https://ipapi.co/${clientIp}/json/`);
-    let countryCode = response.data?.country_code || 'US';
-
-    // Check if country is blocked or not
-    const blockedCountryCheck = await BlockedCountry.findOne({
-      code: countryCode,
-    });
-    if (blockedCountryCheck?._id) {
-      return response.error(res, {}, 'Country Blocked!', 400);
-    }
-
-    // Find country details
-    const country = await Country.findOne({ code: countryCode });
-    if (!country?._id) {
-      return response.error(res, {}, 'Invalid Country!', 400);
-    }
-    return response.success(res, country, 'Country found successfully.', 200);
-  } catch (err) {
-    return response.error(res, err, 'Error Occurred.', err.status || 500);
-  }
-};
 
 // Update countries data to database
 exports.updateCountries = async (req, res) => {
@@ -261,7 +223,7 @@ exports.updateCountries = async (req, res) => {
 };
 
 // Add Blocked Country
-exports.addBlockedCountry = async (req, res) => {
+exports.blockCountry = async (req, res) => {
   try {
     const { name, dial_code, code } = req.body;
     const blockedCountry = new BlockedCountry({

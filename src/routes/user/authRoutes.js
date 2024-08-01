@@ -7,7 +7,14 @@ const {
   verifyResend,
   forgetPassword,
   resetPassword,
+  userCountry,
+  sendOtp,
 } = require('../../controllers/user/AuthController');
+
+// User Country (Based on REQUEST)
+router.get(`/get-country`, userCountry);
+
+router.post(`/send-otp`, sendOtp);
 
 router.post(`/register`, register);
 

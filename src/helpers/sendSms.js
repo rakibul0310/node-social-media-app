@@ -12,7 +12,7 @@ const sendSms = async (toPhone, message) => {
       to: toPhone,
     });
   } catch (err) {
-    throw new Error('Error occurred while sending SMS');
+    console.log(err);
   }
 };
 

@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 
 const userSchema = mongoose.Schema(
   {
+    name: {
+      type: String,
+      trim: true,
+    },
     countryCode: {
       type: String,
       required: true,
@@ -17,10 +21,6 @@ const userSchema = mongoose.Schema(
       required: true,
       trim: true,
       unique: true,
-    },
-    isVerified: {
-      type: Boolean,
-      default: false,
     },
   },
   {

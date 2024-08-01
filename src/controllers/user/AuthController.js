@@ -7,15 +7,104 @@ const sendSms = require('../../helpers/sendSms');
 const { User } = require('../../models/User');
 const { Otp } = require('../../models/Otp');
 const response = require('../../helpers/response');
+const { Country } = require('../../models/Country');
+const axios = require('axios');
 
 const url = config.get('APP_URL');
 const api = config.get('API_URL');
 
+exports.userCountry = async (req, res) => {
+  try {
+    // Get User IP from Request Body
+    let clientIp = '';
+    if (req.headers['x-forwarded-for']) {
+      clientIp = req.headers['x-forwarded-for'].split(',').shift().trim();
+    } else if (
+      req.socket &&
+      req.socket.remoteAddress &&
+      req.socket.remoteAddress !== '::1'
+    ) {
+      clientIp = req.socket.remoteAddress;
+    } else {
+      clientIp = req.ip; // IP from ExpressJS using `app.set("trust proxy", true);`
+    }
+
+    // Get Country from IP
+    const getIp = await axios.get(`https://ipapi.co/${clientIp}/json/`);
+    let countryCode = getIp.data?.country_code || 'US';
+
+    console.log(clientIp);
+    console.log(getIp.data);
+
+    // Check if country is blocked or not
+    const countryCheck = await Country.findOne({
+      code: countryCode,
+    });
+    if (countryCheck?._id && countryCheck.status === false) {
+      return response.error(res, {}, 'Country Blocked!', 400);
+    }
+
+    if (!countryCheck?._id) {
+      return response.error(res, {}, 'Invalid Country!', 400);
+    }
+    return response.success(
+      res,
+      countryCheck,
+      'Country found successfully.',
+      200,
+    );
+  } catch (err) {
+    return response.error(res, err, 'Error Occurred.', err.status || 500);
+  }
+};
+
+// send otp
+exports.sendOtp = async (req, res) => {
+  const { countryCode, localNumber } = req.body;
+  const phoneNumber = countryCode + localNumber;
+
+  // find existing otp and delete
+  await Otp.findOneAndDelete({ phoneNumber });
+
+  // create otp
+  const otpNumber = Math.floor(Math.random() * 999999);
+  const otp = new Otp({
+    phoneNumber,
+    otp: 1111 || otpNumber,
+    expire_at: new Date(new Date().getTime() + 60 * 5000),
+  });
+  // save otp to db
+  await otp.save();
+
+  // send otp sms
+  sendSms(
+    phoneNumber,
+    `Your OTP is: ${otpNumber}. This OTP is valid for 5 minutes`,
+  );
+
+  return response.success(
+    res,
+    {
+      phoneNumber,
+    },
+    'OTP has been sent to your phone.',
+    201,
+  );
+};
+
 exports.register = async (req, res) => {
   try {
-    const { countryCode, localNumber } = req.body;
+    const { countryCode, localNumber, otp } = req.body;
 
     const phoneNumber = countryCode + localNumber;
+
+    // Validating OTP
+    const otpData = await Otp.findOne({ otp, phoneNumber });
+
+    if (!otpData?._id || otpData.phoneNumber !== phoneNumber) {
+      return response.error(res, {}, 'Invalid OTP.', 400);
+    }
+
     const user = new User({
       countryCode,
       localNumber,
@@ -24,32 +113,15 @@ exports.register = async (req, res) => {
     // create user
     await user.save();
 
-    // create otp
-    const otpNumber = Math.floor(Math.random() * 999999);
-    const otp = new Otp({
-      user_id: user.id,
-      otp: otpNumber,
-      expire_at: new Date(new Date().getTime() + 60 * 5000),
-    });
-    // save otp to db
-    await otp.save();
-
-    // send otp sms
-    sendSms(
-      phoneNumber,
-      `Your OTP is: ${otpNumber}. This OTP is valid for 5 minutes`,
-    );
-
     return response.success(
       res,
       {
         userId: user.id,
         phoneNumber: user.phoneNumber,
-        isVerified: user.isVerified,
         created_at: user.created_at,
         updated_at: user.created_at,
       },
-      'OTP has been sent to your phone.',
+      'Registered successfully.',
       201,
     );
   } catch (err) {
@@ -59,33 +131,27 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
+    const { countryCode, localNumber, otp } = req.body;
+
+    const phoneNumber = countryCode + localNumber;
+
+    // Validating OTP
+    const otpData = await Otp.findOne({ otp, phoneNumber });
+
+    if (!otpData?._id || otpData.phoneNumber !== phoneNumber) {
+      return response.error(res, {}, 'Invalid OTP.', 400);
+    }
+
     // check user
-    const user = await User.findOne({ email: req.body.email }).select(
-      'name email +password isAdmin',
-    );
-    if (!user && !user.isVerified) {
+    const user = await User.findOne({ phoneNumber: phoneNumber });
+    if (!user?._id) {
       return response.error(res, {}, 'Authentication Field!', 401);
     }
-
-    // check password
-    const isValidPassword = bcrypt.compareSync(
-      req.body.password,
-      user.password,
-    );
-    if (user && !isValidPassword) {
-      return response.error(
-        res,
-        {},
-        'Credentials not match. Please try again!',
-        401,
-      );
-    }
-
     // generate a token
     const token = jwt.sign(
       {
         user_id: user.id,
-        isAdmin: user.isAdmin,
+        phoneNumber: user.phoneNumber,
       },
       process.env.JWT_SECRET,
       { expiresIn: '99y' },
@@ -95,9 +161,8 @@ exports.login = async (req, res) => {
       res,
       {
         user: {
-          name: user.name,
-          email: user.email,
-          // phone: user.phone,
+          user_id: user.id,
+          phoneNumber: user.phoneNumber,
         },
         token,
       },
