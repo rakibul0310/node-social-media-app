@@ -1,0 +1,506 @@
+{
+	"info": {
+		"_postman_id": "a6aff939-90c3-4aa8-8b4e-377346abb0fc",
+		"name": "node-social-media-app",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "21847534",
+		"_collection_link": "https://inleads-it.postman.co/workspace/CoWorks~8a4c2286-cc19-49f5-90ba-3aedf4c21922/collection/21847534-a6aff939-90c3-4aa8-8b4e-377346abb0fc?action=share&source=collection_link&creator=21847534"
+	},
+	"item": [
+		{
+			"name": "user_routes",
+			"item": [
+				{
+					"name": "auth",
+					"item": [
+						{
+							"name": "Country Check",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": "{{base_url}}/api/user/auth/get-country"
+							},
+							"response": [
+								{
+									"name": "New Request",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": "{{base_url}}/api/user/auth/get-country"
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "391"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"187-i4/Ygdk28RsQi0gaL09MnMlcaqw\""
+										},
+										{
+											"key": "Date",
+											"value": "Thu, 01 Aug 2024 12:11:00 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"Country found successfully.\",\n    \"success\": true,\n    \"status\": 200,\n    \"data\": {\n        \"currency\": {\n            \"code\": \"USD\",\n            \"name\": \"United States dollar\",\n            \"symbol\": \"$\"\n        },\n        \"language\": {\n            \"code\": \"en\",\n            \"name\": \"English\"\n        },\n        \"name\": \"United States of America\",\n        \"code\": \"US\",\n        \"country_code\": \"+1\",\n        \"capital\": \"Washington, D.C.\",\n        \"region\": \"NA\",\n        \"flag\": \"https://restcountries.eu/data/usa.svg\",\n        \"status\": true,\n        \"id\": \"66ab73dced1b396d555fe1ee\"\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Register user",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"countryCode\" : \"+880\", \"localNumber\": 1678201521, \"otp\": 1111\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{base_url}}/api/user/auth/register"
+							},
+							"response": [
+								{
+									"name": "Register user",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"countryCode\" : \"+880\", \"localNumber\": 1678201521, \"otp\": 1111\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{base_url}}/api/user/auth/register"
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "222"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"de-QGDhH1teER+N6xe2STZlgzGzyDc\""
+										},
+										{
+											"key": "Date",
+											"value": "Thu, 01 Aug 2024 16:02:08 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"Registered successfully.\",\n    \"success\": true,\n    \"status\": 201,\n    \"data\": {\n        \"userId\": \"66abb1806ac287f5e9a7399a\",\n        \"phoneNumber\": \"+8801678201521\",\n        \"created_at\": \"2024-08-01T16:02:08.139Z\",\n        \"updated_at\": \"2024-08-01T16:02:08.139Z\"\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Login user",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"countryCode\" : \"+880\", \"localNumber\": 1678201521, \"otp\": 1111\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{base_url}}/api/user/auth/login"
+							},
+							"response": [
+								{
+									"name": "Login user",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"countryCode\" : \"+880\", \"localNumber\": 1678201521, \"otp\": 1111\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{base_url}}/api/user/auth/login"
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "377"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"179-VDRQtMdUoRG/gVacESAicYq9fTE\""
+										},
+										{
+											"key": "Date",
+											"value": "Thu, 01 Aug 2024 16:10:43 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"Login Successfully!\",\n    \"success\": true,\n    \"status\": 200,\n    \"data\": {\n        \"user\": {\n            \"user_id\": \"66abb1806ac287f5e9a7399a\",\n            \"phoneNumber\": \"+8801678201521\"\n        },\n        \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjZhYmIxODA2YWMyODdmNWU5YTczOTlhIiwicGhvbmVOdW1iZXIiOiIrODgwMTY3ODIwMTUyMSIsImlhdCI6MTcyMjUyODY0MywiZXhwIjo0ODQ2NzMxMDQzfQ.FWu56gwZ419sGmEmvb2A5wm9PKh5VF1_Yl_lVrzxMdI\"\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Send Otp",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"countryCode\" : \"+880\", \"localNumber\": 1678201521\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{base_url}}/api/user/auth/send-otp"
+							},
+							"response": [
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"countryCode\" : \"+880\", \"localNumber\": 1678201521\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "{{base_url}}/api/user/auth/send-otp"
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "114"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"72-kJTiXHw30HiQZE46Qj6s240Y7bY\""
+										},
+										{
+											"key": "Date",
+											"value": "Thu, 01 Aug 2024 16:01:21 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"OTP has been sent to your phone.\",\n    \"success\": true,\n    \"status\": 201,\n    \"data\": {\n        \"phoneNumber\": \"+8801678201521\"\n    }\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "user",
+					"item": [
+						{
+							"name": "Verify OTP",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"imran565774@gmail.com\",\n    \"otp\": 208\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{base_url}}/api/user/verify/otp"
+							},
+							"response": []
+						},
+						{
+							"name": "Verify Password",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"imran565774@gmail.com\",\n    \"otp\": 208\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{base_url}}/api/user/verify/password"
+							},
+							"response": []
+						},
+						{
+							"name": "Profile Update",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Rakibul Hasan\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{base_url}}/api/user/profile/update"
+							},
+							"response": [
+								{
+									"name": "Profile Update",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"Rakibul Hasan\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": "https://node-dev-u7z3.onrender.com/api/user/profile/update"
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "*"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "281"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"119-pTgQu2AGQEj2QFxg3BKzK5RQLOM\""
+										},
+										{
+											"key": "Date",
+											"value": "Thu, 25 Jul 2024 17:46:15 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"Profile updated successfully.\",\n    \"success\": true,\n    \"status\": 200,\n    \"data\": {\n        \"name\": \"Rakibul Hasan\",\n        \"email\": \"rakibul2180@gmail.com\",\n        \"isVerified\": true,\n        \"isAdmin\": false,\n        \"created_at\": \"2024-07-25T17:05:45.821Z\",\n        \"updated_at\": \"2024-07-25T17:46:14.980Z\",\n        \"id\": \"66a285e95096b33788612dcf\"\n    }\n}"
+								}
+							]
+						}
+					],
+					"auth": {
+						"type": "bearer",
+						"bearer": {
+							"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjZhMjg1ZTk1MDk2YjMzNzg4NjEyZGNmIiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTcyMTkyOTQzMiwiZXhwIjo0ODQ2MTMxODMyfQ.4dTNndbWkMeZ-p8zsx425J5xyjKnXxLxuwumC4iogc8"
+						}
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": {
+					"token": ""
+				}
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+}
