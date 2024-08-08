@@ -9,6 +9,7 @@ const { Otp } = require('../../models/Otp');
 const response = require('../../helpers/response');
 const { Country } = require('../../models/Country');
 const axios = require('axios');
+const checkOtpRateLimit = require('../../helpers/checkOtpRateLimit');
 
 const url = config.get('APP_URL');
 const api = config.get('API_URL');
@@ -60,8 +61,21 @@ exports.sendOtp = async (req, res) => {
   const { countryCode, number } = req.body;
   const phoneNumber = countryCode + number;
 
-  // find existing otp and delete
-  await Otp.findOneAndDelete({ phoneNumber });
+  // find out all otps with this phoneNumber the latest one first
+  const existingOtps = await Otp.find({ number: phoneNumber }).sort({
+    createdAt: -1,
+  });
+
+  if (existingOtps.length > 0) {
+    if (!checkOtpRateLimit(existingOtps?.length, existingOtps[0]?.createdAt)) {
+      return response.error(
+        res,
+        {},
+        'You have reached the maximum limit of OTPs. Please try again later.',
+        400,
+      );
+    }
+  }
 
   // create otp
   const otpNumber = Math.floor(Math.random() * 999999);
@@ -138,6 +152,8 @@ exports.login = async (req, res) => {
     return response.error(res, err, 'Error Occurred.', err.status || 500);
   }
 };
+
+exports.linkEmail = async (req, res) => {};
 
 exports.verifyByLink = async (req, res) => {
   try {
