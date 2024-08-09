@@ -7,7 +7,15 @@ const {
   changePassword,
   updateCountries,
   blockCountry,
+  reportUser,
+  blockUser,
 } = require('../../controllers/user/UserController');
+
+// Report User
+router.post(`/report-user`, reportUser);
+
+// Block User
+router.post(`/block-user`, blockUser);
 
 // Verify OTP
 router.post(`/verify/otp`, verifyOTP);

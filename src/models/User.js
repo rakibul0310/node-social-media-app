@@ -39,6 +39,13 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    nb_suspended: {
+      type: Number,
+      default: 0,
+    },
+    suspension_expire: {
+      type: Date,
+    },
   },
   {
     timestamps: {

@@ -10,9 +10,76 @@ const { Otp } = require('../../models/Otp');
 const { Country } = require('../../models/Country');
 const { BlockedCountry } = require('../../models/BlockedCountry');
 const response = require('../../helpers/response');
+const { ReportedUser } = require('../../models/ReportedUser');
+const { BlockedUser } = require('../../models/BlockedUser');
 
 const url = config.get('APP_URL');
 const api = config.get('API_URL');
+
+// Link email to account
+exports.linkEmail = async (req, res) => {};
+
+// report an user
+exports.reportUser = async (req, res) => {
+  try {
+    const { user_id: reported_by } = jwt_decode(req.headers.authorization);
+    const { user_id, reason } = req.body;
+
+    // Validating User
+    const reportingUser = await User.findOne({ _id: user_id });
+    const user = await User.findOne({ _id: reported_by });
+    if (!user || !reportingUser) {
+      return response.error(res, {}, 'Invalid User!', 401);
+    }
+
+    // Report User
+    const reported = new ReportedUser({
+      user: user_id,
+      reported_by,
+      reason,
+    });
+    await reported.save();
+
+    return response.success(res, reported, 'User reported successfully.', 201);
+  } catch (err) {
+    return response.error(res, err, 'Error Occurred.', err.status || 500);
+  }
+};
+
+// block an user
+exports.blockUser = async (req, res) => {
+  try {
+    const { user_id } = jwt_decode(req.headers.authorization);
+    const { blocked_user } = req.body;
+
+    // Validating User
+    const user = await User.findOne({ _id: user_id });
+    const blockingUser = await User.findOne({ _id: blocked_user });
+    if (!user || !blockingUser) {
+      return response.error(res, {}, 'Invalid User!', 401);
+    }
+
+    // Block User
+    const blocked = await BlockedUser.findOneAndUpdate(
+      {
+        user: user_id,
+      },
+      {
+        $push: {
+          blocked_user: blocked_user,
+        },
+      },
+      {
+        new: true,
+        upsert: true,
+      },
+    );
+
+    return response.success(res, blocked, 'User blocked successfully.', 201);
+  } catch (err) {
+    return response.error(res, err, 'Error Occurred.', err.status || 500);
+  }
+};
 
 // Verify OTP
 exports.verifyOTP = async (req, res) => {

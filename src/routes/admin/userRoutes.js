@@ -4,7 +4,11 @@ const {
   getUsers,
   getUserById,
   getUsersCount,
+  suspendUser,
 } = require('../../controllers/admin/UserController');
+
+// Suspend User
+router.post(`/suspend/:id`, isModerator, suspendUser);
 
 // Get Users
 router.get('/', isModerator, getUsers);

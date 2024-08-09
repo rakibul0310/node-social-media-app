@@ -10,6 +10,7 @@ const response = require('../../helpers/response');
 const { Country } = require('../../models/Country');
 const axios = require('axios');
 const checkOtpRateLimit = require('../../helpers/checkOtpRateLimit');
+const checkUserSuspension = require('../../helpers/checkUserSuspension');
 
 const url = config.get('APP_URL');
 const api = config.get('API_URL');
@@ -67,7 +68,7 @@ exports.sendOtp = async (req, res) => {
   });
 
   if (existingOtps.length > 0) {
-    if (!checkOtpRateLimit(existingOtps?.length, existingOtps[0]?.createdAt)) {
+    if (!checkOtpRateLimit(existingOtps?.length, existingOtps[0]?.created_at)) {
       return response.error(
         res,
         {},
@@ -125,9 +126,15 @@ exports.login = async (req, res) => {
       },
       { new: true, upsert: true, setDefaultsOnInsert: true },
     );
+
     if (!user?._id) {
       return response.error(res, {}, 'Authentication Field!', 401);
     }
+
+    if (!checkUserSuspension(user?.suspension_expire)) {
+      return response.error(res, {}, 'User Suspended!', 400);
+    }
+
     // generate a token
     const token = jwt.sign(
       {
@@ -152,8 +159,6 @@ exports.login = async (req, res) => {
     return response.error(res, err, 'Error Occurred.', err.status || 500);
   }
 };
-
-exports.linkEmail = async (req, res) => {};
 
 exports.verifyByLink = async (req, res) => {
   try {
