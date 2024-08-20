@@ -9,7 +9,9 @@ const {
   blockCountry,
   reportUser,
   blockUser,
+  uploadContactList,
 } = require('../../controllers/user/UserController');
+const multerCSV = require('../../utils/multerCSV');
 
 // Report User
 router.post(`/report-user`, reportUser);
@@ -37,5 +39,12 @@ router.get(`/update-countries`, updateCountries);
 
 // Add Blocked Country
 router.post(`/add-blocked-country`, blockCountry);
+
+// contact upload
+router.post(
+  `/upload-contacts`,
+  multerCSV.single('contacts'),
+  uploadContactList,
+);
 
 module.exports = router;

@@ -12,6 +12,8 @@ const { BlockedCountry } = require('../../models/BlockedCountry');
 const response = require('../../helpers/response');
 const { ReportedUser } = require('../../models/ReportedUser');
 const { BlockedUser } = require('../../models/BlockedUser');
+const csvtojsonV2 = require('csvtojson/v2');
+const { Contact } = require('../../models/Contact');
 
 const url = config.get('APP_URL');
 const api = config.get('API_URL');
@@ -300,6 +302,85 @@ exports.blockCountry = async (req, res) => {
     });
     await blockedCountry.save();
     return response.success(res, blockedCountry, 'Country blocked.', 201);
+  } catch (err) {
+    return response.error(res, err, 'Error Occurred.', err.status || 500);
+  }
+};
+
+// upload contact list
+exports.uploadContactList = async (req, res) => {
+  try {
+    const file = req.file?.path;
+    const { user_id } = jwt_decode(req.headers.authorization);
+    if (!file) {
+      return response.error(res, {}, 'File not found.', 404);
+    }
+    const contactArray = await csvtojsonV2().fromFile(file);
+    if (contactArray?.length <= 0 && !contactArray[0]?.number) {
+      return response.error(res, {}, 'Invalid file format.', 400);
+    }
+
+    await Promise.all(
+      contactArray.map(async contact => {
+        const user = await User.findOne({ number: contact.number });
+        // if user already exist in the requester contact list then skip to the next loop
+        const isContactExist = await Contact.findOne({
+          $and: [{ user: user_id }, { recipient: user?._id }],
+        });
+        if (isContactExist?._id) {
+          return;
+        }
+        if (
+          user?._id &&
+          user_id !== user?._id.toString() &&
+          user?.type === 'private'
+        ) {
+          const currentUserContact = await Contact.findOne({
+            $and: [{ user: user?._id }, { recipient: user_id }],
+          });
+          if (currentUserContact?._id) {
+            await Contact.create({
+              user: user_id,
+              recipient: user?._id,
+              status: true,
+            });
+            await Contact.findOneAndUpdate(
+              { _id: currentUserContact?._id },
+              { status: true },
+              { new: true },
+            );
+          } else {
+            await Contact.create({
+              user: user_id,
+              recipient: user?._id,
+              status: false,
+            });
+          }
+        }
+        if (
+          user?._id &&
+          user_id !== user?._id.toString() &&
+          user?.type === 'public'
+        ) {
+          await Contact.create({
+            user: user_id,
+            recipient: user?._id,
+            status: true,
+          });
+        }
+      }),
+    );
+
+    const allContacts = await Contact.find({ user: user_id })
+      .populate('user')
+      .populate('recipient');
+
+    return response.success(
+      res,
+      allContacts,
+      'File uploaded successfully.',
+      200,
+    );
   } catch (err) {
     return response.error(res, err, 'Error Occurred.', err.status || 500);
   }
