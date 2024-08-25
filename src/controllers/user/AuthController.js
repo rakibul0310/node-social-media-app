@@ -11,6 +11,7 @@ const { Country } = require('../../models/Country');
 const axios = require('axios');
 const checkOtpRateLimit = require('../../helpers/checkOtpRateLimit');
 const checkUserSuspension = require('../../helpers/checkUserSuspension');
+const createDefaultList = require('../../helpers/createDefaultList');
 
 const url = config.get('APP_URL');
 const api = config.get('API_URL');
@@ -126,6 +127,8 @@ exports.login = async (req, res) => {
       },
       { new: true, upsert: true, setDefaultsOnInsert: true },
     );
+
+    await createDefaultList(user._id);
 
     if (!user?._id) {
       return response.error(res, {}, 'Authentication Field!', 401);

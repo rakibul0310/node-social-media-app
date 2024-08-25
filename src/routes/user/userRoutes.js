@@ -1,5 +1,18 @@
 const router = require('express').Router();
 const {
+  createList,
+  getAllLists,
+  getList,
+  addContactToList,
+  removeContactFromList,
+} = require('../../controllers/user/ListController');
+const {
+  createPost,
+  getAllPosts,
+  updatePost,
+  deletePost,
+} = require('../../controllers/user/PostController');
+const {
   verifyOTP,
   verifyPassword,
   profileUpdate,
@@ -46,5 +59,18 @@ router.post(
   multerCSV.single('contacts'),
   uploadContactList,
 );
+
+// List Routes
+router.post(`/list`, createList);
+router.get(`/list`, getAllLists);
+router.get(`/list/:id`, getList);
+router.put(`/list/add-constct/:id`, addContactToList);
+router.put(`/list/remove-contact/:id`, removeContactFromList);
+
+// Post Routes
+router.post(`/post`, createPost);
+router.get(`/post`, getAllPosts);
+router.put(`/post/:id`, updatePost);
+router.delete(`/post/:id`, deletePost);
 
 module.exports = router;
