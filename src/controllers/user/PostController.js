@@ -3,6 +3,8 @@ const jwt_decode = require('jwt-decode');
 const Post = require('../../models/Post');
 const { User } = require('../../models/User');
 const List = require('../../models/List');
+const { ReportedPost } = require('../../models/ReportedPost');
+const { HidedPost } = require('../../models/HidedPost');
 
 exports.createPost = async (req, res) => {
   try {
@@ -42,6 +44,15 @@ exports.getAllPosts = async (req, res) => {
     }).populate('user');
     await Promise.all(
       posts.map(async post => {
+        const hidePosts = await HidedPost.findOne({
+          post: post._id,
+          hided_by: user_id,
+        });
+
+        if (hidePosts?._id) {
+          return;
+        }
+
         if (post.visibility === 'list') {
           const list = await List.findOne({
             $or: [
@@ -85,5 +96,37 @@ exports.deletePost = async (req, res) => {
     response.success(res, null, 'Post deleted successfully');
   } catch (err) {
     response.error(res, err, 'Error deleting post');
+  }
+};
+
+exports.reportPost = async (req, res) => {
+  try {
+    const { reason } = req.body;
+    const { id } = req.params;
+    const { user_id } = jwt_decode(req.headers.authorization);
+    const reportPost = await ReportedPost.create({
+      post: id,
+      reported_by: user_id,
+      reason: reason || 'No reason provided',
+    });
+
+    response.success(res, reportPost, 'Post reported successfully', 201);
+  } catch (err) {
+    response.error(res, err, 'Error reporting post');
+  }
+};
+
+exports.hidePost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { user_id } = jwt_decode(req.headers.authorization);
+    const hidePost = await HidedPost.create({
+      post: id,
+      hided_by: user_id,
+    });
+
+    response.success(res, hidePost, 'Post hidden successfully', 201);
+  } catch (err) {
+    response.error(res, err, 'Error hiding post');
   }
 };

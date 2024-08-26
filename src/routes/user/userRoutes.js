@@ -1,5 +1,12 @@
 const router = require('express').Router();
 const {
+  getComment,
+  getComments,
+  addComment,
+  getCommentReply,
+  deleteComment,
+} = require('../../controllers/user/CommentController');
+const {
   createList,
   getAllLists,
   getList,
@@ -11,6 +18,8 @@ const {
   getAllPosts,
   updatePost,
   deletePost,
+  reportPost,
+  hidePost,
 } = require('../../controllers/user/PostController');
 const {
   verifyOTP,
@@ -24,6 +33,7 @@ const {
   blockUser,
   uploadContactList,
 } = require('../../controllers/user/UserController');
+const { addView, getViews } = require('../../controllers/user/ViewController');
 const multerCSV = require('../../utils/multerCSV');
 
 // Report User
@@ -72,5 +82,18 @@ router.post(`/post`, createPost);
 router.get(`/post`, getAllPosts);
 router.put(`/post/:id`, updatePost);
 router.delete(`/post/:id`, deletePost);
+router.post(`/post/report/:id`, reportPost);
+router.post(`/post/hide/:id`, hidePost);
+
+// View Routes
+router.post(`/view`, addView);
+router.get(`/view/:post_id`, getViews);
+
+// Comments Routes
+router.post(`/comment`, addComment);
+router.get(`/comment/:post_id`, getComments);
+router.get(`/comment/:id`, getComment);
+router.get(`/comment/reply/:comment_id`, getCommentReply);
+router.delete(`/comment/:id`, deleteComment);
 
 module.exports = router;
