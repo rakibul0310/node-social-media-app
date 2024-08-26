@@ -65,11 +65,22 @@ exports.sendOtp = async (req, res) => {
 
   // find out all otps with this phoneNumber the latest one first
   const existingOtps = await Otp.find({ number: phoneNumber }).sort({
-    createdAt: -1,
+    created_at: -1,
   });
 
   if (existingOtps.length > 0) {
-    if (!checkOtpRateLimit(existingOtps?.length, existingOtps[0]?.created_at)) {
+    console.log(
+      checkOtpRateLimit(existingOtps?.length, existingOtps[0]?.created_at),
+    );
+    console.log(
+      checkOtpRateLimit(existingOtps?.length, existingOtps[0]?.created_at),
+    );
+    if (
+      checkOtpRateLimit(
+        existingOtps?.length,
+        existingOtps[0]?.created_at === false,
+      )
+    ) {
       return response.error(
         res,
         {},
@@ -93,15 +104,8 @@ exports.sendOtp = async (req, res) => {
   sendSms(
     phoneNumber,
     `Your OTP is: ${otpNumber}. This OTP is valid for 5 minutes`,
-  );
-
-  return response.success(
     res,
-    {
-      phoneNumber,
-    },
-    'OTP has been sent to your phone.',
-    201,
+    otp._id,
   );
 };
 
