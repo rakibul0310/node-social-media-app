@@ -6,6 +6,7 @@ const {
   getCommentReply,
   deleteComment,
 } = require('../../controllers/user/CommentController');
+const { addFeed, showFeed } = require('../../controllers/user/FeedController');
 const {
   createList,
   getAllLists,
@@ -21,6 +22,12 @@ const {
   reportPost,
   hidePost,
 } = require('../../controllers/user/PostController');
+const {
+  getAllTimeline,
+  getListTimeline,
+  getUserTimeline,
+  searchTimeline,
+} = require('../../controllers/user/TimelineController');
 const {
   verifyOTP,
   verifyPassword,
@@ -95,5 +102,15 @@ router.get(`/comment/:post_id`, getComments);
 router.get(`/comment/:id`, getComment);
 router.get(`/comment/reply/:comment_id`, getCommentReply);
 router.delete(`/comment/:id`, deleteComment);
+
+// Feed Routes
+router.post(`/feed`, addFeed);
+router.get(`/feed/:user_id`, showFeed);
+
+// Timeline Routes
+router.get(`/timeline/show`, getAllTimeline);
+router.get(`/timeline/list/:list_name`, getListTimeline);
+router.get(`/timeline/user/:user_id`, getUserTimeline);
+router.get(`/timeline/search`, searchTimeline);
 
 module.exports = router;
