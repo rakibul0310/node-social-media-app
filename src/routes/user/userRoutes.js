@@ -39,9 +39,13 @@ const {
   reportUser,
   blockUser,
   uploadContactList,
+  linkEmail,
 } = require('../../controllers/user/UserController');
 const { addView, getViews } = require('../../controllers/user/ViewController');
 const multerCSV = require('../../utils/multerCSV');
+
+// Link Email
+router.post(`/link-email`, linkEmail);
 
 // Report User
 router.post(`/report-user`, reportUser);
@@ -105,7 +109,7 @@ router.delete(`/comment/:id`, deleteComment);
 
 // Feed Routes
 router.post(`/feed`, addFeed);
-router.get(`/feed/:user_id`, showFeed);
+router.get(`/feed`, showFeed);
 
 // Timeline Routes
 router.get(`/timeline/show`, getAllTimeline);

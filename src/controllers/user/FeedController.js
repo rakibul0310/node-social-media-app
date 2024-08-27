@@ -17,11 +17,11 @@ exports.addFeed = async (req, res) => {
 // Show the feed from the beginning or from a specified number of item.
 exports.showFeed = async (req, res) => {
   try {
-    const { user_id } = req.params;
+    const { user_id } = jwt_decode(req.headers.authorization);
     const { start } = req.query;
     const feed = await Feed.find({ user_id })
       .sort({ createdAt: -1 })
-      .skip(parseInt(start));
+      .skip(parseInt(start || 0));
 
     return response.success(res, feed, 'Feed retrieved successfully.');
   } catch (err) {

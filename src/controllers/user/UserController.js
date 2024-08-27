@@ -14,12 +14,75 @@ const { ReportedUser } = require('../../models/ReportedUser');
 const { BlockedUser } = require('../../models/BlockedUser');
 const csvtojsonV2 = require('csvtojson/v2');
 const { Contact } = require('../../models/Contact');
+const List = require('../../models/List');
+const { HidedPost } = require('../../models/HidedPost');
+const View = require('../../models/View');
+const { ReportedPost } = require('../../models/ReportedPost');
+const Feed = require('../../models/Feed');
 
 const url = config.get('APP_URL');
 const api = config.get('API_URL');
 
 // Link email to account
-exports.linkEmail = async (req, res) => {};
+exports.linkEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const { user_id } = jwt_decode(req.headers.authorization);
+
+    const existingUserWithEmail = await User.findOne({ email });
+
+    if (existingUserWithEmail?._id) {
+      await BlockedUser.updateMany(
+        { user: existingUserWithEmail._id },
+        { user: user_id },
+      );
+      await Comment.updateMany(
+        { user_id: existingUserWithEmail._id },
+        { user_id: user_id },
+      );
+      await Contact.findOneAndUpdate(
+        { user: existingUserWithEmail._id },
+        { user: user_id },
+      );
+      await Feed.updateMany(
+        { user_id: existingUserWithEmail._id },
+        { user_id: user_id },
+      );
+      await HidedPost.updateMany(
+        { hided_by: existingUserWithEmail._id },
+        { hided_by: user_id },
+      );
+      await List.updateMany(
+        { user: existingUserWithEmail._id },
+        { user: user_id },
+      );
+      await Post.updateMany(
+        { user: existingUserWithEmail._id },
+        { user: user_id },
+      );
+      await ReportedPost.updateMany(
+        { reported_by: existingUserWithEmail._id },
+        { reported_by: user_id },
+      );
+      await ReportedUser.updateMany(
+        { reported_by: existingUserWithEmail._id },
+        { reported_by: user_id },
+      );
+      await View.updateMany(
+        { user_id: existingUserWithEmail._id },
+        { user_id: user_id },
+      );
+      await User.findOneAndDelete({ _id: existingUserWithEmail._id });
+      await User.findOneAndUpdate({ _id: user_id }, { email });
+    } else {
+      await User.findOneAndUpdate({ _id: user_id }, { email });
+    }
+
+    return response.success(res, {}, 'Email linked successfully.', 200);
+  } catch (err) {
+    return response.error(res, err, 'Error Occurred.', err.status || 500);
+  }
+};
 
 // report an user
 exports.reportUser = async (req, res) => {
