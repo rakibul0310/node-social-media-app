@@ -132,7 +132,10 @@ exports.login = async (req, res) => {
       return response.error(res, {}, 'Authentication Field!', 401);
     }
 
-    if (!checkUserSuspension(user?.suspension_expire)) {
+    if (
+      user?.suspension_expire &&
+      !checkUserSuspension(user?.suspension_expire)
+    ) {
       return response.error(res, {}, 'User Suspended!', 400);
     }
 
