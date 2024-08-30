@@ -68,27 +68,21 @@ exports.sendOtp = async (req, res) => {
     created_at: -1,
   });
 
-  if (existingOtps.length > 0) {
-    console.log(
-      checkOtpRateLimit(existingOtps?.length, existingOtps[0]?.created_at),
-    );
-    console.log(
-      checkOtpRateLimit(existingOtps?.length, existingOtps[0]?.created_at),
-    );
-    if (
-      checkOtpRateLimit(
-        existingOtps?.length,
-        existingOtps[0]?.created_at === false,
-      )
-    ) {
-      return response.error(
-        res,
-        {},
-        'You have reached the maximum limit of OTPs. Please try again later.',
-        400,
-      );
-    }
-  }
+  // if (existingOtps.length > 0) {
+  //   if (
+  //     checkOtpRateLimit(
+  //       existingOtps?.length,
+  //       existingOtps[0]?.created_at === false,
+  //     )
+  //   ) {
+  //     return response.error(
+  //       res,
+  //       {},
+  //       'You have reached the maximum limit of OTPs. Please try again later.',
+  //       400,
+  //     );
+  //   }
+  // }
 
   // create otp
   const otpNumber = Math.floor(Math.random() * 999999);
