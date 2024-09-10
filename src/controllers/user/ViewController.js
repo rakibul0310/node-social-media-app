@@ -1,6 +1,7 @@
 const View = require('../../models/View');
 const response = require('../../helpers/response');
 const jwt_decode = require('jwt-decode');
+const Post = require('../../models/Post');
 
 exports.addView = async (req, res) => {
   try {
@@ -12,6 +13,11 @@ exports.addView = async (req, res) => {
     }
     const view = new View({ user_id, post_id });
     const newView = await view.save();
+
+    // update post view count
+    await Post.findByIdAndUpdate(post_id, {
+      $inc: { view: 1 },
+    });
 
     return response.success(res, newView, 'View added successfully.');
   } catch (err) {

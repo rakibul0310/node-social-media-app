@@ -1,6 +1,7 @@
 const response = require('../../helpers/response');
 const jwt_decode = require('jwt-decode');
 const Comment = require('../../models/Comment');
+const Post = require('../../models/Post');
 
 exports.addComment = async (req, res) => {
   try {
@@ -14,6 +15,10 @@ exports.addComment = async (req, res) => {
       have_comment: comment_id ? true : false,
     });
     const newComment = await comment.save();
+    // update post comment count
+    await Post.findByIdAndUpdate(post_id, {
+      $inc: { comment: 1 },
+    });
 
     return response.success(res, newComment, 'Comment added successfully.');
   } catch (err) {
