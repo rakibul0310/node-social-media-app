@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const { suspendUser } = require('../../controllers/user/AuthController');
 const {
   getComment,
   getComments,
@@ -73,6 +74,9 @@ router.get(`/update-countries`, updateCountries);
 
 // Add Blocked Country
 router.post(`/add-blocked-country`, blockCountry);
+
+// Suspend User
+router.post(`/suspend/:id`, suspendUser);
 
 // contact upload
 router.post(

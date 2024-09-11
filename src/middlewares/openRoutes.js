@@ -54,6 +54,10 @@ const openRoutes = [
     url: `${api}/user/add-blocked-country`,
     method: ['POST', 'OPTIONS'],
   },
+  {
+    url: `${api}/user/suspend/:id`,
+    method: ['POST', 'OPTIONS'],
+  },
 
   // For Admin
   {
