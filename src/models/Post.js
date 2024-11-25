@@ -40,6 +40,14 @@ const postSchema = new Schema(
       type: Number,
       default: 0,
     },
+    media: {
+      image_location: {
+        type: String,
+      },
+      image_public_url: {
+        type: String,
+      },
+    },
   },
   {
     timestamps: true,

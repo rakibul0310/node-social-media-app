@@ -5,6 +5,9 @@ const { User } = require('../../models/User');
 const List = require('../../models/List');
 const { ReportedPost } = require('../../models/ReportedPost');
 const { HidedPost } = require('../../models/HidedPost');
+const storage = require('../../../config/storage');
+const fs = require('fs');
+const path = require('path');
 
 exports.createPost = async (req, res) => {
   try {
@@ -18,6 +21,22 @@ exports.createPost = async (req, res) => {
       visibility,
     } = req.body;
     const { user_id } = jwt_decode(req.headers.authorization);
+    let uploadedImage = {};
+    if (req.file) {
+      const uploadParams = {
+        Bucket: process.env.STORAGE_BUCKET,
+        Key: Date.now().toString() + path.extname(req.file.originalname), // Assuming req.file.path is the path to the uploaded file
+        Body: fs.createReadStream(req.file.path),
+        ACL: 'public-read', // Set appropriate permissions
+      };
+      const upload = await storage.upload(uploadParams).promise();
+      if (upload?.Location) {
+        uploadedImage = {
+          image_location: upload.Location,
+          image_public_url: upload.Key,
+        };
+      }
+    }
     const post = new Post({
       user: user_id,
       type,
@@ -27,6 +46,7 @@ exports.createPost = async (req, res) => {
       location_data,
       link_data,
       visibility,
+      media: uploadedImage,
     });
     await post.save();
     response.success(res, post, 'Post created successfully', 201);
@@ -82,6 +102,21 @@ exports.getAllPosts = async (req, res) => {
 exports.updatePost = async (req, res) => {
   try {
     const { id } = req.params;
+    if (req.file) {
+      const uploadParams = {
+        Bucket: process.env.STORAGE_BUCKET,
+        Key: Date.now().toString() + path.extname(req.file.originalname), // Assuming req.file.path is the path to the uploaded file
+        Body: fs.createReadStream(req.file.path),
+        ACL: 'public-read', // Set appropriate permissions
+      };
+      const upload = await storage.upload(uploadParams).promise();
+      if (upload?.Location) {
+        req.body.media = {
+          image_location: upload.Location,
+          image_public_url: upload.Key,
+        };
+      }
+    }
     const post = await Post.findByIdAndUpdate(id, req.body, { new: true });
     response.success(res, post, 'Post updated successfully');
   } catch (err) {

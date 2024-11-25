@@ -11,6 +11,7 @@
   "author": "iqbal045",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.1692.0",
     "axios": "^1.7.2",
     "bcryptjs": "^2.4.3",
     "chalk": "^4.1.2",
