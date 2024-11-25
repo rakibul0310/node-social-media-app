@@ -43,6 +43,7 @@ const {
   linkEmail,
 } = require('../../controllers/user/UserController');
 const { addView, getViews } = require('../../controllers/user/ViewController');
+const upload = require('../../utils/multer');
 const multerCSV = require('../../utils/multerCSV');
 
 // Link Email
@@ -93,9 +94,9 @@ router.put(`/list/add-constct/:id`, addContactToList);
 router.put(`/list/remove-contact/:id`, removeContactFromList);
 
 // Post Routes
-router.post(`/post`, createPost);
+router.post(`/post`, upload.single('media'), createPost);
 router.get(`/post`, getAllPosts);
-router.put(`/post/:id`, updatePost);
+router.put(`/post/:id`, upload.single('media'), updatePost);
 router.delete(`/post/:id`, deletePost);
 router.post(`/post/report/:id`, reportPost);
 router.post(`/post/hide/:id`, hidePost);
